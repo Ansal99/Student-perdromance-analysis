@@ -1,0 +1,12 @@
+{
+  "name": "student-performance-prediction",
+  "version": "1.0.0",
+  "description": "Student Performance Analysis & Prediction System using Machine Learning",
+  "private": true,
+  "scripts": {
+    "install": "pip install -r requirements.txt",
+    "dev": "python app.py",
+    "start": "python app.py",
+    "build": "echo 'Build complete - Flask application ready'"
+  }
+}

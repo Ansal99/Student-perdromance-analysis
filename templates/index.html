@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Analysis & Prediction System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="main-title">Student Performance Analysis & Prediction</h1>
+                <p class="subtitle">AI-Powered Academic Performance Forecasting System</p>
+            </div>
+        </header>
+        
+        <!-- Health banner (updated dynamically) -->
+        <div id="health-banner" class="health-banner" style="display: none;"></div>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="prediction">Prediction</button>
+            <button class="tab-btn" data-tab="analytics">Analytics</button>
+            <button class="tab-btn" data-tab="model">Model Info</button>
+            <button class="tab-btn" data-tab="records">Records</button>
+            <button class="tab-btn" data-tab="ai-chat">AI Chat</button>
+        </nav>
+
+        <div class="tab-content active" id="prediction-tab">
+            <div class="card">
+                <h2 class="card-title">Student Performance Prediction</h2>
+                <p class="card-description">Enter student details to predict final exam performance</p>
+
+                <form id="prediction-form" class="prediction-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="student_name">Student Name</label>
+                            <input type="text" id="student_name" name="student_name" placeholder="Enter student name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attendance">Attendance Percentage</label>
+                            <input type="number" id="attendance" name="attendance" min="0" max="100" step="0.1" placeholder="0-100" required>
+                            <span class="input-hint">Current: <span id="attendance-value">0</span>%</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="study_hours">Study Hours per Day</label>
+                            <input type="number" id="study_hours" name="study_hours" min="0" max="24" step="0.5" placeholder="0-24" required>
+                            <span class="input-hint">Current: <span id="study-hours-value">0</span> hours</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="previous_score">Previous Exam Score</label>
+                            <input type="number" id="previous_score" name="previous_score" min="0" max="100" step="0.1" placeholder="0-100" required>
+                            <span class="input-hint">Current: <span id="previous-score-value">0</span></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Predict Performance</span>
+                        <span class="btn-loader" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <div id="prediction-result" class="prediction-result" style="display: none;">
+                    <div class="result-header">
+                        <h3>Prediction Results</h3>
+                        <div class="predicted-score">
+                            <span class="score-label">Predicted Score</span>
+                            <span class="score-value" id="predicted-score">0</span>
+                        </div>
+                    </div>
+
+                    <div class="risk-assessment">
+                        <div class="risk-badge" id="risk-badge">
+                            <span id="risk-level">-</span>
+                        </div>
+                    </div>
+
+                    <div class="recommendations">
+                        <h4>Recommendations</h4>
+                        <ul id="recommendations-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="analytics-tab">
+            <div class="card">
+                <h2 class="card-title">Data Visualization & Analytics</h2>
+                <p class="card-description">Explore relationships between performance factors</p>
+
+                <div class="chart-controls">
+                    <button class="btn btn-secondary chart-btn active" data-chart="correlation">Correlation Matrix</button>
+                    <button class="btn btn-secondary chart-btn" data-chart="scatter">Scatter Plots</button>
+                    <button class="btn btn-secondary chart-btn" data-chart="distribution">Distribution</button>
+                </div>
+
+                <div class="chart-container">
+                    <div id="chart-loader" class="chart-loader">
+                        <div class="loader"></div>
+                        <p>Loading visualization...</p>
+                    </div>
+                    <img id="chart-image" class="chart-image" style="display: none;" alt="Data Visualization">
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="model-tab">
+            <div class="card">
+                <h2 class="card-title">Machine Learning Model Information</h2>
+                <p class="card-description">Linear Regression model performance metrics</p>
+
+                <div id="model-info" class="model-info">
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <span class="info-label">R² Score</span>
+                            <span class="info-value" id="r2-score">-</span>
+                            <span class="info-description">Model accuracy (higher is better)</span>
+                        </div>
+
+                        <div class="info-card">
+                            <span class="info-label">RMSE</span>
+                            <span class="info-value" id="rmse">-</span>
+                            <span class="info-description">Root Mean Squared Error</span>
+                        </div>
+                    </div>
+
+                    <div class="coefficients">
+                        <h3>Model Coefficients</h3>
+                        <div class="coefficients-grid">
+                            <div class="coefficient-item">
+                                <span class="coef-label">Attendance</span>
+                                <span class="coef-value" id="coef-attendance">-</span>
+                            </div>
+                            <div class="coefficient-item">
+                                <span class="coef-label">Study Hours</span>
+                                <span class="coef-value" id="coef-study-hours">-</span>
+                            </div>
+                            <div class="coefficient-item">
+                                <span class="coef-label">Previous Score</span>
+                                <span class="coef-value" id="coef-previous-score">-</span>
+                            </div>
+                            <div class="coefficient-item">
+                                <span class="coef-label">Intercept</span>
+                                <span class="coef-value" id="coef-intercept">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="model-equation">
+                        <h3>Prediction Equation</h3>
+                        <p class="equation">Final Score = (Attendance × <span id="eq-attendance">-</span>) + (Study Hours × <span id="eq-study-hours">-</span>) + (Previous Score × <span id="eq-previous-score">-</span>) + <span id="eq-intercept">-</span></p>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="load-model-info">Load Model Information</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="records-tab">
+            <div class="card">
+                <h2 class="card-title">Student Records</h2>
+                <p class="card-description">Recent prediction history</p>
+
+                <div class="records-container">
+                    <button class="btn btn-primary" id="load-records">Load Recent Records</button>
+
+                    <div id="records-table-container" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="records-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Attendance</th>
+                                        <th>Study Hours</th>
+                                        <th>Previous Score</th>
+                                        <th>Predicted Score</th>
+                                        <th>Risk Level</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="records-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="ai-chat-tab">
+            <div class="card">
+                <h2 class="card-title">AI Academic Advisor</h2>
+                <p class="card-description">Chat with our AI assistant for academic advice and insights</p>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message system">
+                            Hello! I'm your AI academic advisor. I can help you with:
+                            <ul>
+                                <li>Understanding your performance predictions</li>
+                                <li>Study strategies and tips</li>
+                                <li>Improving attendance and study habits</li>
+                                <li>Academic performance optimization</li>
+                                <li>General academic advice</li>
+                            </ul>
+                            How can I assist you today?
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <form id="chat-form" class="chat-form">
+                            <input type="text" id="chat-input" placeholder="Type your message here..." required>
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-text">Send</span>
+                                <span class="btn-loader" style="display: none;"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Student Performance Analysis & Prediction System</p>
+            <p>Developed by Ansal (22010203006) | Atal Bihari Vajpayee Govt. Institute of Engineering & Technology</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
